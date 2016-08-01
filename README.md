@@ -3,7 +3,7 @@
 ## tplink-smartplug.py ##
 
 A python client for the proprietary TP-Link Smart Home protocol to control TP-Link HS100 and HS110 WiFi Smart Plugs.
-The SmartHome protocol runs on UDP port 9999 and uses a trivial XOR autokey encryption that provides no security. 
+The SmartHome protocol runs on TCP port 9999 and uses a trivial XOR autokey encryption that provides no security. 
 
 There is no authentication mechanism and commands are accepted independent of device state (configured/unconfigured).
 
@@ -43,7 +43,7 @@ More advanced commands such as creating or editing rules can be issued using the
 
 ## Wireshark Dissector ##
 
-Wireshark dissector to decrypt TP-Link Smart Home Protocol packets (UDP port 9999).
+Wireshark dissector to decrypt TP-Link Smart Home Protocol packets (TCP port 9999).
 
 ![ScreenShot](wireshark-dissector.PNG)
 
