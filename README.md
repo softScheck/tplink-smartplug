@@ -34,7 +34,7 @@ Provide the target IP using `-t` and a command to send using either `-c` or `-j`
 | wlanscan  | Scan for nearby access points        |
 | time      | Returns the system time              |
 | schedule  | Lists configured schedule rules      |
-| countdown | Lists configured countdown rules]    |
+| countdown | Lists configured countdown rules     |
 | antitheft | Lists configured antitheft rules     |
 | reboot    | Reboot the device                    |
 | reset     | Reset the device to factory settings |
