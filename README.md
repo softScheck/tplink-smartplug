@@ -1,5 +1,7 @@
 # TP-Link WiFi SmartPlug Client and Wireshark Dissector
 
+For the full story, see [Reverse Engineering the TP-Link HS110](https://www.softscheck.com/en/reverse-engineering-tp-link-hs110/)
+
 ## tplink-smartplug.py ##
 
 A python client for the proprietary TP-Link Smart Home protocol to control TP-Link HS100 and HS110 WiFi Smart Plugs.
