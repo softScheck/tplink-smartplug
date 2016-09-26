@@ -181,6 +181,10 @@ tddp_packet = "".join([tddp_ver, tddp_type, tddp_code, tddp_reply, tddp_length, 
 tddp_digest = hashlib.md5(binascii.unhexlify(tddp_packet)).hexdigest()
 tddp_packet = tddp_packet[:24] + tddp_digest + tddp_packet[56:]
 
+# Binding receive socket in advance in case reply comes fast.
+sock_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock_receive.bind(('', port_receive))
+
 # Send a request
 sock_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock_send.sendto(binascii.unhexlify(tddp_packet), (ip, port_send))
@@ -191,8 +195,6 @@ print "Request Data:\tVersion", t[0:2], "Type", t[2:4], "Status", t[6:8], "Lengt
 sock_send.close()
 
 # Receive the reply
-sock_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock_receive.bind(('', port_receive))
 response, addr = sock_receive.recvfrom(1024)
 r = response.encode('hex')
 if args.verbose:
