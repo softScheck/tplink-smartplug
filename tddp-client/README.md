@@ -3,7 +3,7 @@
 A proof-of-concept python client to talk to a TP-Link device using the **TP-Link Device Debug Protocol (TDDP)**.
 
 TDDP is implemented across a whole range of TP-Link devices including routers, access points, cameras and smartplugs.
-TDDP can read and write a device's configuration and issue special commands. UDP port 1040 is used send commands, replies come back on UDP port 61000. This client has been tested with a TP-Link Archer C9 Wireless Router and TP-Link HS-110 WiFi Smart Plug.
+TDDP can read and write a device's configuration and issue special commands. UDP port 1040 is used to send commands, replies come back on UDP port 61000. This client has been tested with a TP-Link Archer C9 Wireless Router and a TP-Link HS-110 WiFi Smart Plug.
 
 TDDP is a binary protocol documented in patent [CN102096654A](https://www.google.com/patents/CN102096654A?cl=en).
 
