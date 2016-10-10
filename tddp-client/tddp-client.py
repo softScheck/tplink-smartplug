@@ -7,20 +7,20 @@
 # The protocol is available on all kinds of TP-Link devices such as routers, cameras, smart plugs etc.
 #
 # by Lubomir Stroetmann
-# Copyright 2016 softScheck GmbH 
-# 
+# Copyright 2016 softScheck GmbH
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# 
+#
 #
 
 from pyDes import *
@@ -29,8 +29,9 @@ import argparse
 import socket
 import struct
 import binascii
+import string
 
-version = 0.1
+version = 0.2
 
 # Default username and password
 username = "admin"
@@ -42,32 +43,32 @@ def validIP(ip):
 		socket.inet_pton(socket.AF_INET, ip)
 	except socket.error:
 		parser.error("Invalid IP Address.")
-	return ip 
-	
+	return ip
+
+# Check if command is two hex chars
+def validHex(cmd):
+	ishex = all(c in string.hexdigits for c in cmd)
+	if len(cmd) == 2 and ishex:
+		return cmd
+	else:
+		parser.error("Please issue a two-character hex command, e.g. 0A")
+
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="Experimental TP-Link TDDPv2 Client v" + str(version))
 parser.add_argument("-v", "--verbose", help="Verbose mode", action="store_true")
 parser.add_argument("-t", "--target", metavar="<ip>", required=True, help="Target IP Address", type=validIP)
-parser.add_argument("-u", "--username", metavar="<username>", help="Username (default: admin)") 
+parser.add_argument("-u", "--username", metavar="<username>", help="Username (default: admin)")
 parser.add_argument("-p", "--password", metavar="<password>", help="Password (default: admin)")
-
-
-# We only allow three different CMD_SPE_OPR commands that read out values from the target device
-# Other values can potentially be write commands and modify the device
-commands = {'test1':"0A", 'test2':"12", 'test3':"14"}
-parser.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands) 
+parser.add_argument("-c", "--command", metavar="<hex>", required=True, help="Command value to send as hex (e.g. 0A)", type=validHex)
 args = parser.parse_args()
 
 # Set Target IP, username and password to calculate DES decryption key for data and command to execute
 ip = args.target
+cmd = args.command
 if args.username:
 	username = args.username
 if args.password:
 	password = args.password
-if args.command is None:
-	cmd = "12"
-else:
-	cmd = commands[args.command]
 
 # TDDP runs on UDP Port 1040
 # Response is sent to UDP Port 61000
@@ -130,7 +131,7 @@ tddp_length = "00000000"
 ## Packet ID
 # 2 bytes
 # supposed to be incremented +1 for each packet
-tddp_id = "0001" 
+tddp_id = "0001"
 
 # Subtype for CMD_SPE_OPR (Special Operations Command)
 # Set to 0x00 for SET_USR_CFG and GET_SYS_INF
@@ -151,6 +152,15 @@ tddp_id = "0001"
 #  0x06 changes MAC
 #  0x13 changes deviceID
 #  0x15 changes deviceID
+#
+# Subtypes that seem to work for an Archer C9 Router:
+#  0x0E returns physical status of WAN link:
+#               wan_ph_link 1 0 = disconnected
+#               wan_ph_link 1 1 = connected
+#  0x0F returns logical status of WAN link: wan_logic_link 1 0
+#  0x0A returns \x00\x09\x00\x01\x00\x00\x00\x00
+#  0x15 returns \x01\x00\x00\x00\x00\x00\x00\x00
+#  0x18 returns 1
 tddp_subtype = cmd
 
 # Reserved
@@ -170,7 +180,7 @@ tddp_data = ""
 tddp_length = len(tddp_data)/2
 tddp_length = "%0.8X" % tddp_length
 
-## Encrypt data with key	
+## Encrypt data with key
 key = des(binascii.unhexlify(tddp_key), ECB)
 data = key.encrypt(binascii.unhexlify(tddp_data))
 
@@ -206,4 +216,3 @@ print "Reply Data:\tVersion", r[0:2], "Type", r[2:4], "Status", r[6:8], "Length"
 recv_data = r[56:]
 if recv_data:
 	print "Decrypted:\t" + key.decrypt(binascii.unhexlify(recv_data))
-
