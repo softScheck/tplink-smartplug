@@ -21,7 +21,7 @@ Instead of `null` we can also write `{}`. Commands can be nested, for example:
 A full list of commands is provided in [tplink-smarthome-commands.txt](tplink-smarthome-commands.txt).
 
 
-#### Usage ####
+#### Python Usage ####
 
    `./tplink-smarthome.py -t <ip> [-c <cmd> || -j <json>]`
 
@@ -86,3 +86,8 @@ Reading out the WAN link status on an Archer C9 in default configuration shows t
    Reply Data:   Version 02 Type 03 Status 00 Length 00000018 ID 0001 Subtype 0e
    Decrypted:    wan_ph_link 1 0
    ```
+
+#### Java Usage ####
+Java program expects 2 arguments
+1) IP Address of the smartplug
+2) Java string escaped command ie. {"system"{}} -> {\"system\"{}}
