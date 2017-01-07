@@ -2,9 +2,7 @@
 -- For decrypting local network traffic between TP-Link 
 -- Smart Home Devices and the Kasa Smart Home App
 --
--- Install under:
--- (Windows)      %APPDATA%\Wireshark\plugins\
--- (Linux, Mac)   $HOME/.wireshark/plugins
+-- Install in the location listed in About Wireshark/Folders/Personal Plugins
 --
 -- by Lubomir Stroetmann
 -- Copyright 2016 softScheck GmbH 
