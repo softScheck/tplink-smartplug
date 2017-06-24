@@ -70,6 +70,7 @@ def decrypt(string):
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="TP-Link Wi-Fi Smart Plug Client v" + str(version))
 parser.add_argument("-t", "--target", metavar="<ip>", required=True, help="Target IP Address", type=validIP)
+parser.add_argument("-v", "--verbose", dest='verbose', action='store_true', help="Display verbose output")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands) 
 group.add_argument("-j", "--json", metavar="<JSON string>", help="Full JSON string of command to send")
@@ -93,7 +94,13 @@ try:
 	data = sock_tcp.recv(2048)
 	sock_tcp.close()
 	
-	print "Sent:     ", cmd
-	print "Received: ", decrypt(data[4:])
+	decrypted = decrypt(data[4:])
+
+	if args.verbose:
+		print "Sent:     ", cmd
+		print "Received: ", decrypted
+	else:
+		print decrypted
+
 except socket.error:
 	quit("Cound not connect to host " + ip + ":" + str(port))
