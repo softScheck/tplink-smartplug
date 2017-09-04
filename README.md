@@ -23,7 +23,7 @@ A full list of commands is provided in [tplink-smarthome-commands.txt](tplink-sm
 
 #### Usage ####
 
-   `./tplink-smarthome.py -t <ip> [-c <cmd> || -j <json>]`
+   `./tplink-smartplug.py -t <ip> [-c <cmd> || -j <json>]`
 
 Provide the target IP using `-t` and a command to send using either `-c` or `-j`. Commands for the `-c` flag:
 
@@ -31,7 +31,7 @@ Provide the target IP using `-t` and a command to send using either `-c` or `-j`
 |-----------|--------------------------------------|
 | on        | Turns on the plug                    |
 | off       | Turns off the plug                   |
-| system    | Returns device info                  |
+| info      | Returns device info                  |
 | cloudinfo | Returns cloud connectivity info      |
 | wlanscan  | Scan for nearby access points        |
 | time      | Returns the system time              |
