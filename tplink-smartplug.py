@@ -47,20 +47,30 @@ commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
 			'reset'    : '{"system":{"reset":{"delay":1}}}'
 }
 
+light_commands = {
+	'on': '{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":1,"transition_period":0}}}',
+	'off': '{"smartlife.iot.smartbulb.lightingservice":{"transition_light_state":{"on_off":0,"transition_period":0}}}'
+}
+
 # Encryption and Decryption of TP-Link Smart Home Protocol
 # XOR Autokey Cipher with starting key = 171
-def encrypt(string):
+def encrypt(string, doHeader=True):
 	key = 171
-	result = "\0\0\0\0"
+	if doHeader:
+		result = "\0\0\0\0"
+	else:
+		result = ""
 	for i in string: 
 		a = key ^ ord(i)
 		key = a
 		result += chr(a)
 	return result
 
-def decrypt(string):
+def decrypt(string, doHeader=True):
 	key = 171 
 	result = ""
+	if doHeader:
+		string = string[4:]
 	for i in string: 
 		a = key ^ ord(i)
 		key = ord(i) 
@@ -70,6 +80,7 @@ def decrypt(string):
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="TP-Link Wi-Fi Smart Plug Client v" + str(version))
 parser.add_argument("-t", "--target", metavar="<ip>", required=True, help="Target IP Address", type=validIP)
+parser.add_argument("-l", "--lightbulb", dest="lightbulb", help="Enable lightbulb mode", action="store_true")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands) 
 group.add_argument("-j", "--json", metavar="<JSON string>", help="Full JSON string of command to send")
@@ -81,19 +92,20 @@ port = 9999
 if args.command is None:
 	cmd = args.json
 else:
-	cmd = commands[args.command]
-
-
+	if args.lightbulb:
+		cmd = light_commands[args.command]
+	else:
+		cmd = commands[args.command]
 
 # Send command and receive reply 
 try:
-	sock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	sock_tcp.connect((ip, port))
-	sock_tcp.send(encrypt(cmd))
-	data = sock_tcp.recv(2048)
-	sock_tcp.close()
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM if args.lightbulb else socket.SOCK_STREAM)
+	sock.settimeout(1)
+	sock.sendto(encrypt(cmd, not args.lightbulb), (ip, port))
+	data = decrypt(sock.recv(2048), not args.lightbulb)
+	sock.close()
 	
 	print "Sent:     ", cmd
-	print "Received: ", decrypt(data[4:])
+	print "Received: ", data
 except socket.error:
 	quit("Cound not connect to host " + ip + ":" + str(port))
