@@ -51,7 +51,7 @@ commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
 # XOR Autokey Cipher with starting key = 171
 def encrypt(string):
 	key = 171
-	result = "\0\0\0\0"
+	result = "\0\0\0"+chr(len(string))
 	for i in string: 
 		a = key ^ ord(i)
 		key = a
