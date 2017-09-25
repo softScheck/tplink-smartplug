@@ -19,9 +19,10 @@
 # limitations under the License.
 #
 #
+from __future__ import print_function
 import socket
 import argparse
-
+from builtins import bytes
 version = 0.2
 
 
@@ -63,7 +64,7 @@ commands = {'info': '{"system":{"get_sysinfo":{}}}',
 def encrypt(string):
     key = 171
     result = b"\0\0\0" + bytes([len(string)])
-    for i in string.encode('latin-1'):
+    for i in bytes(string.encode('latin-1')):
         a = key ^ i
         key = a
         result += bytes([a])
@@ -73,7 +74,7 @@ def encrypt(string):
 def decrypt(string):
     key = 171
     result = b""
-    for i in string:
+    for i in bytes(string):
         a = key ^ i
         key = i
         result += bytes([a])
