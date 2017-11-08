@@ -21,6 +21,7 @@
 #
 import socket
 import argparse
+from struct import pack
 
 version = 0.1
 
@@ -51,7 +52,7 @@ commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
 # XOR Autokey Cipher with starting key = 171
 def encrypt(string):
 	key = 171
-	result = "\0\0\0\0"
+	result = pack('>I', len(string))
 	for i in string: 
 		a = key ^ ord(i)
 		key = a
