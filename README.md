@@ -40,6 +40,7 @@ Provide the target IP using `-t` and a command to send using either `-c` or `-j`
 | antitheft | Lists configured antitheft rules     |
 | reboot    | Reboot the device                    |
 | reset     | Reset the device to factory settings |
+| energy    | Return realtime voltage/current/power|
 
 More advanced commands such as creating or editing rules can be issued using the `-j` flag by providing the full JSON string for the command. Please consult [tplink-smarthome-commands.txt](tplink-smarthome-commands.txt) for a comprehensive list of commands.
 
