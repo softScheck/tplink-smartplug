@@ -25,13 +25,13 @@ import struct
 
 version = 0.1
 
-# Check if IP is valid
-def validIP(ip):
+# Check if hostname is valid
+def validHostname(hostname):
 	try:
-		socket.inet_pton(socket.AF_INET, ip)
+		socket.gethostbyname(hostname)
 	except socket.error:
-		parser.error("Invalid IP Address.")
-	return ip
+		parser.error("Invalid hostname.")
+	return hostname
 
 # Predefined Smart Plug Commands
 # For a full list of commands, consult tplink_commands.txt
@@ -70,7 +70,7 @@ def decrypt(string):
 
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="TP-Link Wi-Fi Smart Plug Client v" + str(version))
-parser.add_argument("-t", "--target", metavar="<ip>", required=True, help="Target IP Address", type=validIP)
+parser.add_argument("-t", "--target", metavar="<hostname>", required=True, help="Target hostname or IP address", type=validHostname)
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands)
 group.add_argument("-j", "--json", metavar="<JSON string>", help="Full JSON string of command to send")
