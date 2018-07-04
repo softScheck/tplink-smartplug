@@ -48,7 +48,7 @@ More advanced commands such as creating or editing rules can be issued using the
 
 Wireshark dissector to decrypt TP-Link Smart Home Protocol packets (TCP port 9999).
 
-![ScreenShot](wireshark-dissector.PNG)
+![ScreenShot](wireshark-dissector.png)
 
 #### Installation ####
 
