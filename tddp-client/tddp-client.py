@@ -21,7 +21,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
 
 from pyDes import *
 import hashlib
@@ -126,7 +125,7 @@ tddp_reply = "00"
 
 ## Packet Length (not including header)
 # 4 bytes
-tddp_length = "00000000"
+tddp_length = "0000002A"
 
 ## Packet ID
 # 2 bytes
@@ -216,3 +215,4 @@ print "Reply Data:\tVersion", r[0:2], "Type", r[2:4], "Status", r[6:8], "Length"
 recv_data = r[56:]
 if recv_data:
 	print "Decrypted:\t" + key.decrypt(binascii.unhexlify(recv_data))
+
