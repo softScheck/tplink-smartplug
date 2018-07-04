@@ -2,7 +2,7 @@
 
 For the full story, see [Reverse Engineering the TP-Link HS110](https://www.softscheck.com/en/reverse-engineering-tp-link-hs110/)
 
-## tplink-smartplug.py ##
+## tplink_smartplug.py ##
 
 A python client for the proprietary TP-Link Smart Home protocol to control TP-Link HS100 and HS110 WiFi Smart Plugs.
 The SmartHome protocol runs on TCP port 9999 and uses a trivial XOR autokey encryption that provides no security. 
@@ -23,7 +23,7 @@ A full list of commands is provided in [tplink-smarthome-commands.txt](tplink-sm
 
 #### Usage ####
 
-   `./tplink-smartplug.py -t <ip> [-c <cmd> || -j <json>]`
+   `./tplink_smartplug.py -t <ip> [-c <cmd> || -j <json>]`
 
 Provide the target IP using `-t` and a command to send using either `-c` or `-j`. Commands for the `-c` flag:
 
