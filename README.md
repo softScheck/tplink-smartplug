@@ -5,7 +5,8 @@ For the full story, see [Reverse Engineering the TP-Link HS110](https://www.soft
 ## tplink_smartplug.py ##
 
 A python client for the proprietary TP-Link Smart Home protocol to control TP-Link HS100 and HS110 WiFi Smart Plugs.
-The SmartHome protocol runs on TCP port 9999 and uses a trivial XOR autokey encryption that provides no security. 
+The SmartHome protocol runs on TCP/UDP port 9999 and uses a trivial XOR autokey encryption that provides no security. 
+Other TP-Link products use the same protocol (such as LB-XXX lightbulbs), but may not be compatible with command templates like `on` or `off`.
 
 There is no authentication mechanism and commands are accepted independent of device state (configured/unconfigured).
 
@@ -23,9 +24,14 @@ A full list of commands is provided in [tplink-smarthome-commands.txt](tplink-sm
 
 #### Usage ####
 
-   `./tplink_smartplug.py -t <ip> [-c <cmd> || -j <json>]`
+   `./tplink_smartplug.py [-h] (-t <hostname> | -b)
+                           [-c <command> | -j <JSON string>] [-u]
+                           [-s <address>] [-T <seconds>]`
 
-Provide the target IP using `-t` and a command to send using either `-c` or `-j`. Commands for the `-c` flag:
+
+Provide the target IP using `-t` and a command to send using either `-c` or `-j`. Use `-u` to use UDP instead of TCP, and use `-b` to send to the 255.255.255.255 broadcast address (also UDP). To send from a specific source address, specify the address with `-s`. To specify a timeout to wait for all devices to reply to a broadcast, use `-T` (also applies to UDP, default 0.5 seconds). When sending a broadcast, the script will dump all responses received and wait until timeout.
+
+Predefined commands for the `-c` flag:
 
 | Command   | Description                          |
 |-----------|--------------------------------------|
@@ -41,6 +47,9 @@ Provide the target IP using `-t` and a command to send using either `-c` or `-j`
 | reboot    | Reboot the device                    |
 | reset     | Reset the device to factory settings |
 | energy    | Return realtime voltage/current/power|
+
+(when no command and no JSON string specified, `info` is used by default)
+
 
 More advanced commands such as creating or editing rules can be issued using the `-j` flag by providing the full JSON string for the command. Please consult [tplink-smarthome-commands.txt](tplink-smarthome-commands.txt) for a comprehensive list of commands.
 
