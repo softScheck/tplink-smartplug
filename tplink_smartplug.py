@@ -122,14 +122,15 @@ if (args.command == "energy") and (args.influxdb != None):
 	# Build URI and query
 	# Something like req_url = "http://localhost:8086/write?db=smarthometest&precision=s"
 	req_url = args.influxdb[0]+"/write?db="+args.influxdb[1]+"&precision=s"
-	# Something like post_data = "water,type=usage,device=sensus value=1"
+	
+	# Something like post_data = "water,type=usage,device=devicename value=1"
 	post_data = ""
 	if (args.influxdb_energy != None):
 		post_data = args.influxdb_energy+" value="+str(energy_joule)
 	if (args.influxdb_power != None):
 		post_data += "\n"+args.influxdb_power+" value="+str(power_W)
 
-	# Post data to influxdb
+	# Post data to influxdb, check for obvious errors
 	try:
 		httpresponse = requests.post(req_url, data=post_data, verify=False, timeout=5)
 		if (httpresponse.status_code != 204):
