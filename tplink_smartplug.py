@@ -96,8 +96,8 @@ try:
 	data = sock_tcp.recv(2048)
 	sock_tcp.close()
 
-	print "Sent:     ", cmd
-	print "Received: ", decrypt(data[4:])
+	print cmd
+	print decrypt(data[4:])
 except socket.error:
 	quit("Cound not connect to host " + ip + ":" + str(port))
 
