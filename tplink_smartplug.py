@@ -111,19 +111,17 @@ if (args.command == "energy") and (args.influxdb != None):
 	import requests
 	import json
 
-	# Get total_wh from json response
+	# Get total_wh and power_mw from json response
 	energy_response = decrypt(data[4:])
 	energy_wh = json.loads(energy_response)['emeter']['get_realtime']['total_wh']
 	energy_joule = int(energy_wh)*3600
-
 	power_mW = json.loads(energy_response)['emeter']['get_realtime']['power_mw']
 	power_W = float(power_mW)/1000.0
 
 	# Build URI and query
 	# Something like req_url = "http://localhost:8086/write?db=smarthometest&precision=s"
-	req_url = args.influxdb[0]+"/write?db="+args.influxdb[1]+"&precision=s"
-	
 	# Something like post_data = "water,type=usage,device=devicename value=1"
+	req_url = args.influxdb[0]+"/write?db="+args.influxdb[1]+"&precision=s"
 	post_data = ""
 	if (args.influxdb_energy != None):
 		post_data = args.influxdb_energy+" value="+str(energy_joule)
