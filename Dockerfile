@@ -1,4 +1,4 @@
-FROM python:2
+FROM python:2-alpine 
 LABEL maintainer="Zetanova <office@zetanova.eu>"
 
 RUN mkdir /usr/src/app

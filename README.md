@@ -52,7 +52,7 @@ More advanced commands such as creating or editing rules can be issued using the
 
 #### Usage ####
 
-   `docker run -it --rm tplink-smartplug -t <ip> [-c <cmd> || -j <json>`
+   `docker run -it --rm tplink-smartplug -t <ip> [-c <cmd> || -j <json>]`
 
 ## Wireshark Dissector ##
 
