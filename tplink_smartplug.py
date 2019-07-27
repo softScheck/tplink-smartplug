@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # TP-Link Wi-Fi Smart Plug Protocol Client
 # For use with TP-Link HS-100 or HS-110
@@ -57,15 +57,15 @@ def encrypt(string):
 	for i in string:
 		a = key ^ ord(i)
 		key = a
-		result += chr(a)
+		result += chr(a).encode('latin-1')                      # Python 2.7 : result += chr(a)
 	return result
 
 def decrypt(string):
 	key = 171
 	result = ""
 	for i in string:
-		a = key ^ ord(i)
-		key = ord(i)
+		a = key ^ ord(chr(i))                                   # Python 2.7 : a = key ^ ord(i)
+		key = ord(chr(i))                                       # Python 2.7 : key = ord(i)		
 		result += chr(a)
 	return result
 
@@ -96,8 +96,8 @@ try:
 	data = sock_tcp.recv(2048)
 	sock_tcp.close()
 
-	print "Sent:     ", cmd
-	print "Received: ", decrypt(data[4:])
+	print("Sent:     ", cmd)
+	print("Received: ", decrypt(data[4:]))
 except socket.error:
 	quit("Cound not connect to host " + ip + ":" + str(port))
 
