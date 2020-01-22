@@ -87,3 +87,13 @@ Reading out the WAN link status on an Archer C9 in default configuration shows t
    Reply Data:   Version 02 Type 03 Status 00 Length 00000018 ID 0001 Subtype 0e
    Decrypted:    wan_ph_link 1 0
    ```
+
+## settime.sh
+
+Especially when you disconnect your Smartplug from the Cloud, the time is not set. Without time set you can't use several functions in the Kasa App, like countdown, shedules or get proper total energy consumption.
+
+With this script you can set the time. 
+
+It has to be placed in the same folder as the tplink_smartplug.py
+
+Usage: `./settime.sh <IP1 of your Smartplug> <IP2 of your Smartplug2> <IP3 of your Smartplug2>` and so on
