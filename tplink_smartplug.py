@@ -19,6 +19,7 @@
 # limitations under the License.
 #
 
+import sys
 import socket
 import argparse
 from struct import pack
@@ -51,23 +52,43 @@ commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
 
 # Encryption and Decryption of TP-Link Smart Home Protocol
 # XOR Autokey Cipher with starting key = 171
-def encrypt(string):
-	key = 171
-	result = pack('>I', len(string))
-	for i in string:
-		a = key ^ ord(i)
-		key = a
-		result += chr(a)
-	return result
+if sys.version_info[0] > 2:
+	def encrypt(string):
+		key = 171
+		result = pack('>I', len(string))
+		for i in string:
+			a = key ^ ord(i)
+			key = a
+			result += bytes([a])
+		return result
 
-def decrypt(string):
-	key = 171
-	result = ""
-	for i in string:
-		a = key ^ ord(i)
-		key = ord(i)
-		result += chr(a)
-	return result
+	def decrypt(string):
+		key = 171
+		result = ""
+		for i in string:
+			a = key ^ i
+			key = i
+			result += chr(a)
+		return result
+
+else:
+	def encrypt(string):
+		key = 171
+		result = pack('>I', len(string))
+		for i in string:
+			a = key ^ ord(i)
+			key = a
+			result += chr(a)
+		return result
+
+	def decrypt(string):
+		key = 171
+		result = ""
+		for i in string:
+			a = key ^ ord(i)
+			key = ord(i)
+			result += chr(a)
+		return result
 
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="TP-Link Wi-Fi Smart Plug Client v" + str(version))
@@ -96,8 +117,7 @@ try:
 	data = sock_tcp.recv(2048)
 	sock_tcp.close()
 
-	print "Sent:     ", cmd
-	print "Received: ", decrypt(data[4:])
+	print("Sent:     ", cmd)
+	print("Received: ", decrypt(data[4:]))
 except socket.error:
 	quit("Cound not connect to host " + ip + ":" + str(port))
-
