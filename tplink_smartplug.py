@@ -52,6 +52,7 @@ commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
 
 # Encryption and Decryption of TP-Link Smart Home Protocol
 # XOR Autokey Cipher with starting key = 171
+# Python 3.x Version
 if sys.version_info[0] > 2:
 	def encrypt(string):
 		key = 171
@@ -71,6 +72,7 @@ if sys.version_info[0] > 2:
 			result += chr(a)
 		return result
 
+# Python 2.x Version
 else:
 	def encrypt(string):
 		key = 171
