@@ -16,9 +16,9 @@ do
 	jahr=$(date +"%Y")
 	monat=$(date +"%m")
 	tag=$(date +"%d")
-	stunde=$(date +"%H")
-	minute=$(date +"%M")
-	sekunde=$(date +"%S")
+	stunde=$(date +"%-H")
+	minute=$(date +"%-M")
+	sekunde=$(date +"%-S")
 	echo $DIR/tplink_smartplug.py -t $i -j "{\"time\":{\"set_timezone\":{\"year\":$jahr,\"month\":$monat,\"mday\":$tag,\"hour\":$stunde,\"min\":$minute,\"sec\":$sekunde,\"index\":42}}}"
 	$DIR/tplink_smartplug.py -t $i -j "{\"time\":{\"set_timezone\":{\"year\":$jahr,\"month\":$monat,\"mday\":$tag,\"hour\":$stunde,\"min\":$minute,\"sec\":$sekunde,\"index\":42}}}"
 done
