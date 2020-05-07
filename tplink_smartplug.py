@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # TP-Link Wi-Fi Smart Plug Protocol Client
 # For use with TP-Link HS-100 or HS-110
@@ -24,7 +24,7 @@ import socket
 import argparse
 from struct import pack
 
-version = 0.2
+version = 0.3
 
 # Check if hostname is valid
 def validHostname(hostname):
@@ -139,10 +139,10 @@ try:
 	decrypted = decrypt(data[4:])
 
 	if args.quiet:
-		print decrypted
+		print(decrypted)
 	else:
-		print "Sent:     ", cmd
-		print "Received: ", decrypted
+		print("Sent:     ", cmd)
+		print("Received: ", decrypted)
 
 except socket.error:
 	quit("Cound not connect to host " + ip + ":" + str(port))
