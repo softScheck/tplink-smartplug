@@ -48,9 +48,11 @@ def validPort(port):
 
 # Predefined Smart Plug Commands
 # For a full list of commands, consult tplink_commands.txt
-commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
+commands = {		'info'     : '{"system":{"get_sysinfo":{}}}',
 			'on'       : '{"system":{"set_relay_state":{"state":1}}}',
 			'off'      : '{"system":{"set_relay_state":{"state":0}}}',
+	    		'ledoff'   : '{"system":{"set_led_off":{"off":1}}}',
+			'ledon'    : '{"system":{"set_led_off":{"off":0}}}',
 			'cloudinfo': '{"cnCloud":{"get_info":{}}}',
 			'wlanscan' : '{"netif":{"get_scaninfo":{"refresh":0}}}',
 			'time'     : '{"time":{"get_time":{}}}',
