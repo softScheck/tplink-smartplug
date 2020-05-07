@@ -22,6 +22,7 @@
 import socket
 import argparse
 from struct import pack
+import json
 
 version = 0.2
 
@@ -52,22 +53,22 @@ commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
 # Encryption and Decryption of TP-Link Smart Home Protocol
 # XOR Autokey Cipher with starting key = 171
 def encrypt(string):
-	key = 171
-	result = pack('>I', len(string))
-	for i in string:
-		a = key ^ ord(i)
-		key = a
-		result += chr(a)
-	return result
+    key = 171
+    result = b"\0\0\0"+ chr(len(string)).encode('latin-1')
+    for i in string.encode('latin-1'):
+        a = key ^ i
+        key = a
+        result += chr(a).encode('latin-1')
+    return result
 
 def decrypt(string):
-	key = 171
-	result = ""
-	for i in string:
-		a = key ^ ord(i)
-		key = ord(i)
-		result += chr(a)
-	return result
+    key = 171 
+    result = ""
+    for i in string: 
+        a = key ^ i
+        key = i 
+        result += chr(a)
+    return result
 
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="TP-Link Wi-Fi Smart Plug Client v" + str(version))
@@ -77,7 +78,6 @@ group.add_argument("-c", "--command", metavar="<command>", help="Preset command 
 group.add_argument("-j", "--json", metavar="<JSON string>", help="Full JSON string of command to send")
 args = parser.parse_args()
 
-
 # Set target IP, port and command to send
 ip = args.target
 port = 9999
@@ -86,8 +86,6 @@ if args.command is None:
 else:
 	cmd = commands[args.command]
 
-
-
 # Send command and receive reply
 try:
 	sock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,9 +93,6 @@ try:
 	sock_tcp.send(encrypt(cmd))
 	data = sock_tcp.recv(2048)
 	sock_tcp.close()
-
-	print "Sent:     ", cmd
-	print "Received: ", decrypt(data[4:])
+	print(json.JSONEncoder().encode({"sent": cmd, "received": decrypt(data[4:])}))
 except socket.error:
 	quit("Cound not connect to host " + ip + ":" + str(port))
-
