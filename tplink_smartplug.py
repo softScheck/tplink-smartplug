@@ -33,6 +33,19 @@ def validHostname(hostname):
 		parser.error("Invalid hostname.")
 	return hostname
 
+# Check if port is valid
+def validPort(port):
+        try:
+            port = int(port)
+        except ValueError:
+            parser.error("Invalid port number.")
+
+        if ((port <= 1024) or (port >65535)) :
+            parser.error("Invalid port number.")
+
+        return port
+
+
 # Predefined Smart Plug Commands
 # For a full list of commands, consult tplink_commands.txt
 commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
@@ -72,6 +85,7 @@ def decrypt(string):
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="TP-Link Wi-Fi Smart Plug Client v" + str(version))
 parser.add_argument("-t", "--target", metavar="<hostname>", required=True, help="Target hostname or IP address", type=validHostname)
+parser.add_argument("-p", "--port", metavar="<port>", default=9999, required=False, help="Target port", type=validPort)
 parser.add_argument("-q", "--quiet", dest='quiet', action='store_true', help="Only show result")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands)
@@ -81,7 +95,7 @@ args = parser.parse_args()
 
 # Set target IP, port and command to send
 ip = args.target
-port = 9999
+port = args.port
 if args.command is None:
 	cmd = args.json
 else:
