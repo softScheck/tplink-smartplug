@@ -112,6 +112,7 @@ parser = argparse.ArgumentParser(description="TP-Link Wi-Fi Smart Plug Client v"
 parser.add_argument("-t", "--target", metavar="<hostname>", required=True, help="Target hostname or IP address", type=validHostname)
 parser.add_argument("-p", "--port", metavar="<port>", default=9999, required=False, help="Target port", type=validPort)
 parser.add_argument("-q", "--quiet", dest='quiet', action='store_true', help="Only show result")
+parser.add_argument("--timeout", default=10, required=False, help="Timeout to establish connection")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands)
 group.add_argument("-j", "--json", metavar="<JSON string>", help="Full JSON string of command to send")
@@ -131,7 +132,9 @@ else:
 # Send command and receive reply
 try:
 	sock_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock_tcp.settimeout(int(args.timeout))
 	sock_tcp.connect((ip, port))
+	sock_tcp.settimeout(None)
 	sock_tcp.send(encrypt(cmd))
 	data = sock_tcp.recv(2048)
 	sock_tcp.close()
@@ -145,4 +148,4 @@ try:
 		print("Received: ", decrypted)
 
 except socket.error:
-	quit("Cound not connect to host " + ip + ":" + str(port))
+	quit("Could not connect to host " + ip + ":" + str(port))
