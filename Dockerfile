@@ -1,10 +1,11 @@
 FROM python:2-alpine 
 LABEL maintainer="Zetanova <office@zetanova.eu>"
 
-RUN mkdir /usr/src/app
+WORKDIR /app
 
-WORKDIR /usr/src/app
+COPY . .
 
-COPY ./tplink_smartplug.py ./tplink_smartplug.py
+# udp reply port
+EXPOSE 61000/udp
 
 ENTRYPOINT [ "python", "tplink_smartplug.py" ]

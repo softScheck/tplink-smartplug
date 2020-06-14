@@ -54,6 +54,10 @@ More advanced commands such as creating or editing rules can be issued using the
 
    `docker run -it --rm tplink-smartplug -t <ip> [-c <cmd> || -j <json>]`
 
+#### usage tddp-client over udp ####
+
+   `docker run -it -p 61000:61000/udp --rm --entrypoint python tplink-smartplug ./tddp-client/tddp-client.py -t <ip> -u username -p password -c 0A`
+
 ## Wireshark Dissector ##
 
 Wireshark dissector to decrypt TP-Link Smart Home Protocol packets (TCP port 9999).
@@ -97,3 +101,4 @@ Reading out the WAN link status on an Archer C9 in default configuration shows t
    Reply Data:   Version 02 Type 03 Status 00 Length 00000018 ID 0001 Subtype 0e
    Decrypted:    wan_ph_link 1 0
    ```
+
