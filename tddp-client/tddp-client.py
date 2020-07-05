@@ -59,6 +59,7 @@ parser.add_argument("-t", "--target", metavar="<ip>", required=True, help="Targe
 parser.add_argument("-u", "--username", metavar="<username>", help="Username (default: admin)")
 parser.add_argument("-p", "--password", metavar="<password>", help="Password (default: admin)")
 parser.add_argument("-c", "--command", metavar="<hex>", required=True, help="Command value to send as hex (e.g. 0A)", type=validHex)
+parser.add_argument("-d", "--data", metavar="string or hex", help="data payload value to send - preface with 0x if in hex")
 args = parser.parse_args()
 
 # Set Target IP, username and password to calculate DES decryption key for data and command to execute
@@ -125,7 +126,7 @@ tddp_reply = "00"
 
 ## Packet Length (not including header)
 # 4 bytes
-tddp_length = "0000002A"
+tddp_length = "00000000"
 
 ## Packet ID
 # 2 bytes
@@ -160,6 +161,20 @@ tddp_id = "0001"
 #  0x0A returns \x00\x09\x00\x01\x00\x00\x00\x00
 #  0x15 returns \x01\x00\x00\x00\x00\x00\x00\x00
 #  0x18 returns 1
+
+# subtypes that seem to work for a TL-WPA7510 2.0
+#  0x0e + "XX" - sets the broadcast 802.11g country code (e.g. "DE", "UK", "US")
+#  0x12 returns a configuration dump, in JSON
+#  0x15 returns 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+#  0x16 returns 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+#  0x18 performs a factory reset
+#  0x19 returns the device model # (TL-WPA7510)
+#  0x1a returns the device model # and hw vers (TL-WPA7510 v2.0)
+#  0x1b returns the firmware version (2.0.2 Build 20190610 Rel.50850)
+#  0x1c returns the mac address of the 2.4Ghz radio
+#  0x1d returns '0'
+#  0x2a returns the (default) wifi password
+
 tddp_subtype = cmd
 
 # Reserved
@@ -170,45 +185,55 @@ tddp_reserved = "00"
 # Set to 0 initially for building the digest, then overwrite with result
 tddp_digest = "%0.32X" % 00
 
-# TDDP Data
+# raw (not encoded or encrypted) TDDP Data
 # Always pad with 0x00 to a length divisible by 8
 # We're not sending any data since we're only sending read commands
 tddp_data = ""
+if args.data:
+	if args.data[0:2] == '0x':
+		tddp_data = binascii.unhexlify(args.data[2:])
+	else:
+		tddp_data = args.data
 
 # Recalculate length if sending data
-tddp_length = len(tddp_data)/2
-tddp_length = "%0.8X" % tddp_length
+tddp_length = "%0.8X" % len(tddp_data)
 
 ## Encrypt data with key
 key = des(binascii.unhexlify(tddp_key), ECB)
-data = key.encrypt(binascii.unhexlify(tddp_data))
+enc_data = key.encrypt(tddp_data)
 
-## Assemble packet
-tddp_packet = "".join([tddp_ver, tddp_type, tddp_code, tddp_reply, tddp_length, tddp_id, tddp_subtype, tddp_reserved, tddp_digest, data.encode('hex')])
+## Assemble packet header
+tddp_packet = "".join([tddp_ver, tddp_type, tddp_code, tddp_reply, tddp_length, tddp_id, tddp_subtype, tddp_reserved, tddp_digest])
 
-# Calculate MD5
-tddp_digest = hashlib.md5(binascii.unhexlify(tddp_packet)).hexdigest()
-tddp_packet = tddp_packet[:24] + tddp_digest + tddp_packet[56:]
+# Calculate MD5 - includes the packet header and the unecrypted data
+tddp_digest = hashlib.md5(binascii.unhexlify(tddp_packet)+tddp_data).hexdigest()
 
-# Binding receive socket in advance in case reply comes fast.
-sock_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock_receive.bind(('', port_receive))
+# assemble the final packet - header, digest and encrypted data
+tddp_packet = tddp_packet[:24] + tddp_digest + binascii.hexlify(enc_data)
 
 # Send a request
-sock_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock_send.sendto(binascii.unhexlify(tddp_packet), (ip, port_send))
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(('',port_receive))
+sock.sendto(binascii.unhexlify(tddp_packet), (ip, port_send))
 if args.verbose:
 	print "Raw Request:\t", tddp_packet
 t = tddp_packet
 print "Request Data:\tVersion", t[0:2], "Type", t[2:4], "Status", t[6:8], "Length", t[8:16], "ID", t[16:20], "Subtype", t[20:22]
-sock_send.close()
+if len(tddp_data):
+	print "\tData:\t", tddp_data
 
 # Receive the reply
-response, addr = sock_receive.recvfrom(1024)
+sock.settimeout(5)
+try:
+	response, addr = sock.recvfrom(1024)
+except socket.timeout:
+	print "No response recv'd"
+	sys.exit(0)
 r = response.encode('hex')
+
 if args.verbose:
 	print "Raw Reply:\t", r
-sock_receive.close()
+sock.close()
 print "Reply Data:\tVersion", r[0:2], "Type", r[2:4], "Status", r[6:8], "Length", r[8:16], "ID", r[16:20], "Subtype", r[20:22]
 
 # Take payload and decrypt using key
