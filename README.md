@@ -54,7 +54,7 @@ The same commands can be modified to control a single outlet by inserting `"cont
 For instance:
 `{"system":{"set_led_off":{"off":0}}}` Will turn all outlets off
 
-'{"context":{"child_ids":["8006...E101"]}, "system":{"set_led_off":{"off":0}}}' Will turn just that one outlet on
+`'{"context":{"child_ids":["8006...E101"]}, "system":{"set_led_off":{"off":0}}}'` Will turn just that one outlet on
 
 You can specify multiple child outlet IDs by adding them to the `child_ids` array in your command.
 
