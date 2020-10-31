@@ -42,7 +42,24 @@ Provide the target IP using `-t` and a command to send using either `-c` or `-j`
 | reset     | Reset the device to factory settings |
 | energy    | Return realtime voltage/current/power|
 
+When using commands from the `-c` list on power strips HS300 and HS303, you can use the `-o` flag to specify a specific outlet on the power strip using the child ID.
+The child ID can be obtained by running the info command on the power strip at looking in the `"system"` > `"get_sysinfo"` > `"children"` sections.
+
 More advanced commands such as creating or editing rules can be issued using the `-j` flag by providing the full JSON string for the command. Please consult [tplink-smarthome-commands.txt](tplink-smarthome-commands.txt) for a comprehensive list of commands.
+
+#### Modifying Commands for HS300 and HS303 for the `-j` flag ####
+
+The same commands can be modified to control a single outlet by inserting `"context":{"child_ids":["CHILD_ID"]}, ` in front of `"system":`. If you dont specify a child outlet, the command will affect the entire power strip.
+
+For instance:
+`{"system":{"set_led_off":{"off":0}}}` Will turn all outlets off
+
+'{"context":{"child_ids":["8006...E101"]}, "system":{"set_led_off":{"off":0}}}' Will turn just that one outlet on
+
+You can specify multiple child outlet IDs by adding them to the `child_ids` array in your command.
+
+Some commands are not outlet specific (ex. `info`) so the child ID(s) will be ignored by your power strip.
+
 
 ## Wireshark Dissector ##
 
