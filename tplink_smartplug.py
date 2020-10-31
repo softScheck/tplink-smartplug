@@ -113,6 +113,7 @@ parser.add_argument("-t", "--target", metavar="<hostname>", required=True, help=
 parser.add_argument("-p", "--port", metavar="<port>", default=9999, required=False, help="Target port", type=validPort)
 parser.add_argument("-q", "--quiet", dest='quiet', action='store_true', help="Only show result")
 parser.add_argument("--timeout", default=10, required=False, help="Timeout to establish connection")
+parser.add_argument("-o", "--outlet", metavar="<outletID>", help="Child outlet ID. Typically around 42 characters. Will be ignored if manually specifying JSON. Use info command to get child IDs")
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-c", "--command", metavar="<command>", help="Preset command to send. Choices are: "+", ".join(commands), choices=commands)
 group.add_argument("-j", "--json", metavar="<JSON string>", help="Full JSON string of command to send")
@@ -126,7 +127,8 @@ if args.command is None:
 	cmd = args.json
 else:
 	cmd = commands[args.command]
-
+	if args.outlet is not None:
+		cmd = '{"context":{"child_ids":["' + args.outlet + '"]}, ' + cmd[1:]
 
 
 # Send command and receive reply
