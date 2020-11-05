@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # TP-Link Device Debug Protocol (TDDP) v2 Client
 # Based on https://www.google.com/patents/CN102096654A?cl=en
@@ -22,15 +22,15 @@
 # limitations under the License.
 #
 
-from pyDes import *
-import hashlib
 import argparse
+import hashlib
 import socket
-import struct
-import binascii
 import string
 
-version = 0.2
+from binascii import hexlify, unhexlify
+from pyDes import *
+
+version = 0.3
 
 # Default username and password
 username = "admin"
@@ -38,19 +38,19 @@ password = "admin"
 
 # Check if IP is valid
 def validIP(ip):
-	try:
-		socket.inet_pton(socket.AF_INET, ip)
-	except socket.error:
-		parser.error("Invalid IP Address.")
-	return ip
+    try:
+        socket.inet_pton(socket.AF_INET, ip)
+    except socket.error:
+        parser.error("Invalid IP Address.")
+    return ip
 
 # Check if command is two hex chars
 def validHex(cmd):
-	ishex = all(c in string.hexdigits for c in cmd)
-	if len(cmd) == 2 and ishex:
-		return cmd
-	else:
-		parser.error("Please issue a two-character hex command, e.g. 0A")
+    ishex = all(c in string.hexdigits for c in cmd)
+    if len(cmd) == 2 and ishex:
+        return cmd
+    else:
+        parser.error("Please issue a two-character hex command, e.g. 0A")
 
 # Parse commandline arguments
 parser = argparse.ArgumentParser(description="Experimental TP-Link TDDPv2 Client v" + str(version))
@@ -65,9 +65,9 @@ args = parser.parse_args()
 ip = args.target
 cmd = args.command
 if args.username:
-	username = args.username
+    username = args.username
 if args.password:
-	password = args.password
+    password = args.password
 
 # TDDP runs on UDP Port 1040
 # Response is sent to UDP Port 61000
@@ -77,9 +77,9 @@ port_receive = 61000
 
 # TDDP DES Key = MD5 of username and password concatenated
 # Key is first 8 bytes only
-tddp_key = hashlib.md5(username + password).hexdigest()[:16]
+tddp_key = hashlib.md5(username.encode() + password.encode()).hexdigest()[:16]
 if args.verbose:
-	print "TDDP Key:\t", tddp_key, "(" + username + password + ")"
+    print("TDDP Key:\t", tddp_key, "(" + username + password + ")")
 
 ##  TDDP Header
 #    0                   1                   2                   3
@@ -176,18 +176,21 @@ tddp_digest = "%0.32X" % 00
 tddp_data = ""
 
 # Recalculate length if sending data
-tddp_length = len(tddp_data)/2
+
+tddp_length = len(tddp_data)//2
 tddp_length = "%0.8X" % tddp_length
 
 ## Encrypt data with key
-key = des(binascii.unhexlify(tddp_key), ECB)
-data = key.encrypt(binascii.unhexlify(tddp_data))
+key = des(unhexlify(tddp_key), ECB)
+data = key.encrypt(unhexlify(tddp_data))
 
 ## Assemble packet
-tddp_packet = "".join([tddp_ver, tddp_type, tddp_code, tddp_reply, tddp_length, tddp_id, tddp_subtype, tddp_reserved, tddp_digest, data.encode('hex')])
+tddp_packet = "".join([tddp_ver, tddp_type, tddp_code, tddp_reply,
+                       tddp_length, tddp_id, tddp_subtype,
+                       tddp_reserved, tddp_digest, hexlify(data.encode()).decode()])
 
 # Calculate MD5
-tddp_digest = hashlib.md5(binascii.unhexlify(tddp_packet)).hexdigest()
+tddp_digest = hashlib.md5(unhexlify(tddp_packet)).hexdigest()
 tddp_packet = tddp_packet[:24] + tddp_digest + tddp_packet[56:]
 
 # Binding receive socket in advance in case reply comes fast.
@@ -196,23 +199,26 @@ sock_receive.bind(('', port_receive))
 
 # Send a request
 sock_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock_send.sendto(binascii.unhexlify(tddp_packet), (ip, port_send))
+sock_send.sendto(unhexlify(tddp_packet), (ip, port_send))
 if args.verbose:
-	print "Raw Request:\t", tddp_packet
+    print("Raw Request:\t", tddp_packet)
 t = tddp_packet
-print "Request Data:\tVersion", t[0:2], "Type", t[2:4], "Status", t[6:8], "Length", t[8:16], "ID", t[16:20], "Subtype", t[20:22]
+print("Request Data:\tVersion", t[0:2], "Type", t[2:4], "Status", t[6:8],
+      "Length", t[8:16], "ID", t[16:20], "Subtype", t[20:22])
 sock_send.close()
 
 # Receive the reply
 response, addr = sock_receive.recvfrom(1024)
-r = response.encode('hex')
+r = hexlify(response).decode()
 if args.verbose:
-	print "Raw Reply:\t", r
+    print("Raw Reply:\t", r)
 sock_receive.close()
-print "Reply Data:\tVersion", r[0:2], "Type", r[2:4], "Status", r[6:8], "Length", r[8:16], "ID", r[16:20], "Subtype", r[20:22]
+print("Reply Data:\tVersion", r[0:2], "Type", r[2:4], "Status", r[6:8],
+      "Length", r[8:16], "ID", r[16:20], "Subtype", r[20:22])
 
 # Take payload and decrypt using key
 recv_data = r[56:]
 if recv_data:
-	print "Decrypted:\t" + key.decrypt(binascii.unhexlify(recv_data))
+    print("Decrypted:\t", end="") 
+    print(key.decrypt(unhexlify(recv_data)))
 
