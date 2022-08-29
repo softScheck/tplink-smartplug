@@ -41,6 +41,8 @@ Provide the target IP using `-t` and a command to send using either `-c` or `-j`
 | reboot    | Reboot the device                    |
 | reset     | Reset the device to factory settings |
 | energy    | Return realtime voltage/current/power|
+| ledon     | Turn on the LED indicator            |
+| ledoff    | Turn off the LED indicator           |
 
 More advanced commands such as creating or editing rules can be issued using the `-j` flag by providing the full JSON string for the command. Please consult [tplink-smarthome-commands.txt](tplink-smarthome-commands.txt) for a comprehensive list of commands.
 
