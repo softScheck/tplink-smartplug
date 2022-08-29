@@ -78,12 +78,12 @@ def encrypt(string):
 
 def decrypt(string):
     key = 171
-    result = ""
+    result = []
     for i in string:
         a = key ^ i
         key = i
-        result += chr(a)
-    return result
+        result.append(a)
+    return bytearray(result).decode('utf-8')
 
 
 # Parse commandline arguments
