@@ -19,6 +19,9 @@ Turn On
 Turn Off
 {"system":{"set_relay_state":{"state":0}}}
 
+Turn On Device LED (Night mode)
+{"system":{"set_led_off":{"off":0}}}
+
 Turn Off Device LED (Night mode)
 {"system":{"set_led_off":{"off":1}}}
 
