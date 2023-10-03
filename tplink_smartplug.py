@@ -61,7 +61,9 @@ commands = {'info'     : '{"system":{"get_sysinfo":{}}}',
             'antitheft': '{"anti_theft":{"get_rules":{}}}',
             'reboot'   : '{"system":{"reboot":{"delay":1}}}',
             'reset'    : '{"system":{"reset":{"delay":1}}}',
-            'energy'   : '{"emeter":{"get_realtime":{}}}'
+            'energy'   : '{"emeter":{"get_realtime":{}}}',
+            'energy_reset'   : '{"emeter":{"erase_emeter_stat":{}}}',
+            'runtime_reset'   : '{"schedule":{"erase_runtime_stat":{}}}'
 }
 
 # Encryption and Decryption of TP-Link Smart Home Protocol
