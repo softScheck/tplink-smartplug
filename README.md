@@ -54,6 +54,11 @@ More advanced commands such as creating or editing rules can be issued using the
 [tplink-smarthome-commands.txt](tplink-smarthome-commands.txt) for a
 comprehensive list of commands.
 
+> [!TIP]
+> For pretty printing the response, use the quiet parameter (-q) and pipe the
+> output through `jq` For example:
+>  `./tplink_smartplug.py -t 192.168.178.49 -c info -q | jq`
+
 ## Wireshark Dissector
 
 Wireshark dissector to decrypt TP-Link Smart Home Protocol packets (TCP port
